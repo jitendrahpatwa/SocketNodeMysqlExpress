@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form.chat { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form.chat input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form.chat button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <p>Mysql Form</p><br>
+    <form action="" id="formUpdate">
+      <input id="id" type="number" autocomplete="off" />
+      <input id="userid" type="number" autocomplete="off" />
+      <input id="salary" type="number" autocomplete="off" />
+      <button type="submit" >Send</button>
+    </form>
+    <br><br>
+    <div id="ms">Loading...</div>
+    <ul id="messages"></ul>
+    <form class="chat" action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="jquery.min.js"></script>
+    <script>
+      $(function () {
+        var socket = io();
+        $('form').submit(function(){
+          socket.emit('chat message', $('#m').val());
+          $('#m').val('');
+          return false;
+        });
+        socket.on('chat message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+        });
+
+
+        socket.on('mysqls',function(rows,err){
+          // console.log(res,err)
+          var html='<table>';
+          for (var i=0; i<rows.length; i++) {
+            html += "<tr><td>"+rows[i].id + '</td><td>' + rows[i].userid + '</td><td>' + rows[i].salary + '</td></tr>';
+          }  
+          html += '</table>';
+          console.log(rows);
+          $('#ms').empty().html(html);
+        })
+
+        $('#formUpdate').submit(function(event){
+          event.preventDefault();
+          var id = $('#id').val();
+          var userid = $('#userid').val();
+          var salary = $('#salary').val();
+          console.log(id,userid,salary)
+          $.ajax({
+            type:"POST",
+            url:"http://localhost:3000/ms/",
+            data:{
+              id:id,
+              userid:userid,
+              salary,salary
+            },
+            success:function(res){
+              console.log("post res,",res)
+            },
+            error:function(err){
+              console.log(err);
+            }
+          });
+        });
+
+      });
+    </script>
+  </body>
+</html>
